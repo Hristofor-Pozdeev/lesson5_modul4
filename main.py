@@ -62,6 +62,8 @@ racket1 = Racket(20, HEIGHT / 2 - RACKET_HEIGHT / 2)
 racket2 = Racket(WIDTH - 30, HEIGHT / 2 - RACKET_HEIGHT / 2)
 ball = Ball(WIDTH / 2 - BALL_RADIUS / 2, HEIGHT / 2 - BALL_RADIUS / 2)
 
+game_started = False
+
 clock = pygame.time.Clock()
 
 while True:
@@ -76,27 +78,26 @@ while True:
     if keys[pygame.K_s]:
         move_racket(racket1, "down")
 
-    # Движение второй ракетки
-    if ball.rect.y < racket2.y:
-        move_racket(racket2, "up")
-    elif ball.rect.y > racket2.y + RACKET_HEIGHT:
-        move_racket(racket2, "down")
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+        game_started = True
 
-    # Движение мяча
-    ball.rect.x += ball.dx
-    ball.rect.y += ball.dy
+    if game_started:
+        if ball.rect.y < racket2.y:
+            move_racket(racket2, "up")
+        elif ball.rect.y > racket2.y + RACKET_HEIGHT:
+            move_racket(racket2, "down")
 
-    # Отскок мяча от верхней и нижней границы
-    if ball.rect.y <= 0 or ball.rect.y >= HEIGHT - BALL_RADIUS:
-        ball.dy = -ball.dy
+        ball.rect.x += ball.dx
+        ball.rect.y += ball.dy
 
-    # Отскок мяча от ракеток
-    if ball.rect.colliderect(racket1.rect) or ball.rect.colliderect(racket2.rect):
-        ball.dx = -ball.dx
+        if ball.rect.y <= 0 or ball.rect.y >= HEIGHT - BALL_RADIUS:
+            ball.dy = -ball.dy
 
-    # Проверка на проигрыш
-    if ball.rect.x < 0 or ball.rect.x > WIDTH:
-        ball = Ball(WIDTH / 2 - BALL_RADIUS / 2, HEIGHT / 2 - BALL_RADIUS / 2)
+        if ball.rect.colliderect(racket1.rect) or ball.rect.colliderect(racket2.rect):
+            ball.dx = -ball.dx
 
-        draw_window(racket1, racket2, ball)
-        clock.tick(60)
+        if ball.rect.x < 0 or ball.rect.x > WIDTH:
+            ball = Ball(WIDTH / 2 - BALL_RADIUS / 2, HEIGHT / 2 - BALL_RADIUS / 2)
+
+    draw_window(racket1, racket2, ball)
+    clock.tick(60)
